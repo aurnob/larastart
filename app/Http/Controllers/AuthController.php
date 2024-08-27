@@ -102,4 +102,13 @@ class AuthController extends Controller
             200
         );
     }
+
+    public function logoutUser(Request $request)
+    {
+        DB::table('personal_access_tokens')
+            ->where('tokenable_id', $request->userId)
+            ->delete();
+
+        return response(['message' => 'logout user'], 200);
+    }
 }

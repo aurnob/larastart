@@ -14,3 +14,11 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/register', 'register');
     Route::post('/login', 'login');
 });
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    //
+    Route::controller(AuthController::class)->group(function () {
+        Route::post('/logout', 'logoutUser');
+    });
+    //    
+});
