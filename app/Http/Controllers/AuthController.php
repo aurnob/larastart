@@ -2,39 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreateNewUser;
 use App\Events\NewUserCreated;
+use App\Http\Requests\CreateUserRequest;
+use App\Http\Requests\LoginRequest;
 use App\Models\User;
+use App\Actions\UserValidation;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
-use Str;
 
 class AuthController extends Controller
 {
+    use ApiResponse;
+
     private $secretKey = "qQKPjndxljuYQi/POiXJa8O19nVO/vTf/DpXO541g=qQKPjndxljuYQi/POiXJa8O19nVO/vTf/DpXO541g=";
 
-    public function register(Request $request)
+    public function register(CreateUserRequest $request, CreateNewUser $createNewUser)
     {
-        $fields = $request->all();
-
-        $errors = Validator::make($fields, [
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6|max:8',
-        ]);
-
-        if ($errors->fails()) {
-            return response($errors->errors()->all(), 422);
-        }
-
-        $user = User::create([
-            'name' => $fields['name'],
-            'email' => $fields['email'],
-            'isValidEmail' => User::IS_INVALID_EMAIL,
-            'password' => bcrypt($fields['password']),
-            'remember_token' => $this->generateRandomCode()
-        ]);
+        $user = $createNewUser->handle($request->validated());
 
         NewUserCreated::dispatch($user);
 
@@ -49,58 +35,40 @@ class AuthController extends Controller
         return redirect('/app/login');
     }
 
-    function generateRandomCode()
+    public function login(LoginRequest $request, UserValidation $userValidation)
     {
-        $code = Str::random(10) . time();
-        return $code;
-    }
-
-    public function login(Request $request)
-    {
-        $fields = $request->all();
-
-        $errors = Validator::make($fields, [
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
-        if ($errors->fails()) {
-            return response($errors->errors()->all(), 422);
-        }
+        $fields = $request->validated();
 
         $user = User::where('email', $fields['email'])->first();
 
-        if (!is_null($user)) {
-
-            if (intval($user->isValidEmail) !== User::IS_VALID_EMAIL) {
-                NewUserCreated::dispatch($user);
-                return response([
-                    'message' => 'We send you an email verification !',
-                    'isLoggedIn' => false
-                ], 422);
-            }
-        }
-
-        if (!$user || !Hash::check($fields['password'], $user->password)) {
-
-            return response([
-                'message' => 'email or password invalid',
+        if (is_null($user) || !Hash::check($fields['password'], $user->password)) {
+            return ApiResponse::error('Invalid email or password', 422, [
                 'isLoggedIn' => false
-            ], 422);
+            ]);
         }
 
+        $emailValidationResult = $userValidation->validateUserEmail($user);
+
+        if ($emailValidationResult) {
+            return ApiResponse::error($emailValidationResult['message'], 422, [
+                'isLoggedIn' => false
+            ]);
+        }
 
         $token = $user->createToken($this->secretKey)->plainTextToken;
-        return response(
-            [
-                'user' => $user,
-                'message' => 'loggedin',
-                'token' => $token,
-                'isLoggedIn' => true
 
-            ],
-            200
-        );
+        return ApiResponse::success([
+            'user' => $user,
+            'token' => $token,
+            'isLoggedIn' => true
+        ], 'Logged in successfully');
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response(['message' => 'logout user'], 200);
     }
 
     public function logoutUser(Request $request)
