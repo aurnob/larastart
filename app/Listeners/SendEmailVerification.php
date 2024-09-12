@@ -23,7 +23,7 @@ class SendEmailVerification implements ShouldQueue
      */
     public function handle(NewUserCreated $event): void
     {
-        sleep(5);
+        sleep(15);
         Mail::to($event->user->email)->send(new SendMail($event->user));
     }
 }
