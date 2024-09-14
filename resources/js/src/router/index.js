@@ -7,26 +7,25 @@ const routes = [
         component: () => import("../pages/auth/AuthPage.vue"),
         children: [
             {
-                path: "/register",
-                name: "register",
+                path: "",
+                name: "register-form",
                 component: () => import("../pages/auth/RegisterPage.vue"),
-            },
-            {
-                path: "/login",
-                name: "login",
-                component: () => import("../pages/auth/LoginPage.vue"),
-            },
+            }
         ],
     },
-
+    {
+        path: "/login",
+        name: "login",
+        component: () => import("../pages/auth/LoginPage.vue"),
+    },
     {
         path: "/admin",
         name: "admin",
         component: () => import("../pages/admin/AdminPage.vue"),
         children: [
             {
-                path: "/admin",
-                name: "admin",
+                path: "",
+                name: "dashboard",
                 component: () => import("../pages/admin/dashboard/DashboardPage.vue"),
             },
 

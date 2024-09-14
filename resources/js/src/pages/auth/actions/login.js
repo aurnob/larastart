@@ -23,12 +23,12 @@ export function useLoginUser() {
     async function login() {
         try {
             loading.value = true
-            const data = await makeHttpReq('login', 'POST', loginInput.value)
+            const response = await makeHttpReq('login', 'POST', loginInput.value)
             loading.value = false
             loginInput.value = {}
-            successMsg(data.message)
-            if (data.isLoggedIn) {
-                localStorage.setItem('userData', JSON.stringify(data))
+            successMsg(response.message)
+            if (response.data.isLoggedIn) {
+                localStorage.setItem('userData', JSON.stringify(response.data))
                 window.location.href = "/admin"
             }
         } catch (error) {
