@@ -9,4 +9,6 @@ enum VisitorType: string
     case Invitee = 'invitee';
     case Organizer = 'organizer';
     case Volunteer = 'volunteer';
+    case SpecialGuest = 'special_guest';
+    case ChiefGuest = 'chief_guest';
 }

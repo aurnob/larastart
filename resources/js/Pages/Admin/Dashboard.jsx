@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import StatCard from '@/components/StatCard'
 import AlertSuccess from '@/components/AlertSuccess'
@@ -12,14 +12,33 @@ const Dashboard = () => {
     const [error, setError] = useState(null);
     const [status, setStatus] = useState(null);
 
-    // Dummy statistics data (you can fetch real data from backend)
-    const stats = {
-        attendees: 14,
-        faculty: 14,
-        delegates: 14,
-        snacks: 7,
-        lunch: 4,
-        dinner: 4,
+    const qrCodeInputRef = useRef(null);
+
+    const [stats, setStats] = useState({
+        attendees: 0,
+        faculty: 0,
+        delegates: 0,
+        snacks: 0,
+        lunch: 0,
+        dinner: 0,
+    });
+
+    useEffect(() => {
+        qrCodeInputRef.current.focus();
+        fetchStats();
+    }, []);
+
+    const fetchStats = async () => {
+        try {
+            const response = await axios.get('/api/stats', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            setStats(response.data);
+        } catch (error) {
+            console.error('Failed to fetch stats:', error);
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -49,9 +68,15 @@ const Dashboard = () => {
             });
 
             setError('');
-            setQrCode('')
+            setQrCode('');
             setSuccess(response.data.success);
-            setStatus('Name: ' + response.data.visitor.name + ', Entry Type: ' + Capitalize(response.data.entries.entry_type) + ', Time: ' + formattedTime(response.data.entries.entry_time))
+            setStatus('Name: ' + response.data.visitor.name + ', Entry Type: ' + Capitalize(response.data.entries.entry_type) + ', Time: ' + formattedTime(response.data.entries.entry_time));
+
+            // Fetch updated stats after successful entry submission
+            fetchStats();
+
+            // Focus back on the QR Code input field after submitting
+            qrCodeInputRef.current.focus();
         } catch (error) {
             setSuccess('');
             const response = error.response.data;
@@ -70,6 +95,9 @@ const Dashboard = () => {
                 setStatus('')
                 setError(response.message);
             }
+
+            // Focus back on the QR Code input field on error
+            qrCodeInputRef.current.focus();
         }
     };
 
@@ -91,6 +119,7 @@ const Dashboard = () => {
                             type="text"
                             id="qrCode"
                             className="flex text-right"
+                            ref={qrCodeInputRef}
                             value={qrCode}
                             onChange={(e) => setQrCode(e.target.value)}
                             placeholder="Enter QR code"

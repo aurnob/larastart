@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Validation\Rule;
 use App\Enums\EntryType;
+use App\Enums\VisitorType;
 use App\Models\Visitor;
 use App\Models\Entry;
 use Carbon\Carbon;
@@ -48,5 +49,51 @@ class VisitorController extends Controller
         ]);
 
         return response()->json(['success' => 'Entry recorded successfully.', 'visitor' => $visitor, 'entries' => $create]);
+    }
+
+    public function getStats()
+    {
+        // Total attendees who have made a venue entry
+        $attendees = Entry::where('entry_type', 'venue_entry')
+            ->distinct('visitor_id')
+            ->count();
+
+        // Total faculty (visitor_type = 'faculty')
+        $faculty = Visitor::where('visitor_type', VisitorType::Faculty)
+            ->whereHas('entries', function ($query) {
+                $query->where('entry_type', EntryType::VenueEntry);
+            })
+            ->count();
+
+        // Total delegates (visitor_type = 'delegate')
+        $delegates = Visitor::where('visitor_type', VisitorType::Delegate)
+            ->whereHas('entries', function ($query) {
+                $query->where('entry_type', EntryType::VenueEntry);
+            })
+            ->count();
+
+        // Total snacks entries
+        $snacks = Entry::where('entry_type', 'snacks')
+            ->distinct('visitor_id')
+            ->count();
+
+        // Total lunch entries
+        $lunch = Entry::where('entry_type', 'lunch')
+            ->distinct('visitor_id')
+            ->count();
+
+        // Total dinner entries
+        $dinner = Entry::where('entry_type', 'dinner')
+            ->distinct('visitor_id')
+            ->count();
+
+        return response()->json([
+            'attendees' => $attendees,
+            'faculty' => $faculty,
+            'delegates' => $delegates,
+            'snacks' => $snacks,
+            'lunch' => $lunch,
+            'dinner' => $dinner,
+        ]);
     }
 }

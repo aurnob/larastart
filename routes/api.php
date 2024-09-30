@@ -25,5 +25,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(VisitorController::class)->group(function () {
         Route::post('/entries', 'scanEntry');
+        Route::get('/stats', 'getStats');
     });
 });
