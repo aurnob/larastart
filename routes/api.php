@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\VisitorController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -20,5 +21,9 @@ Route::middleware('api')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::controller(AuthController::class)->group(function () {
         Route::post('/logout', 'logout');
+    });
+
+    Route::controller(VisitorController::class)->group(function () {
+        Route::post('/entries', 'scanEntry');
     });
 });
