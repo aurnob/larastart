@@ -103,99 +103,72 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="lg:flex">
-            <div className="form-section md:basis-[100%] basis-[45%]">
+        <div className="lg:flex lg:min-h-screen">
+            {/* Form Section */}
+            <div className="form-section flex flex-col justify-center md:basis-[100%] lg:basis-[45%] p-4 lg:p-6 bg-gray-50">
                 <div className="w-full flex justify-center items-center">
                     <div className="flex justify-center items-center w-36 h-36 bg-zinc-200 text-white rounded-full overflow-hidden">
-                        <img src="/images/logo.png" alt="MOBS Congress 2024" className="w-full h-full object-contain" />
+                        <img src="/images/logo.jpeg" alt="MOBS Congress 2024" className="w-full h-full object-contain" />
                     </div>
                 </div>
 
                 <h1 className="flex justify-center my-4 text-xl font-bold text-sky-800">MOSB Congress 2024</h1>
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="input-group md:flex w-full">
                         <label htmlFor="qrCode" className="flex w-1/4 md:ml-6 items-center">Scan QR</label>
                         <input
                             type="text"
                             id="qrCode"
-                            className="flex text-right"
+                            className="flex-grow text-right p-2 border border-gray-300 rounded-md"
                             ref={qrCodeInputRef}
                             value={qrCode}
                             onChange={(e) => setQrCode(e.target.value)}
                             placeholder="Enter QR code"
                         />
                     </div>
-                    <div className="input-group md:flex w-full h-8">
-                        <label className="flex w-1/4 md:ml-6 items-center">Entry Type</label>
-                        <div className="entry-options flex w-full p-1">
-                            <label>
-                                <input
-                                    type="radio"
-                                    value="venue_entry"
-                                    checked={entryType === 'venue_entry'}
-                                    onChange={(e) => setEntryType(e.target.value)}
-                                />
-                                <span className="ml-1">Venue Entry</span>
-                            </label>
-                            <label>
-                                <input
-                                    type="radio"
-                                    value="snacks"
-                                    checked={entryType === 'snacks'}
-                                    onChange={(e) => setEntryType(e.target.value)}
-                                />
-                                <span className="ml-1">Snacks</span>
-                            </label>
-                            <label>
-                                <input
-                                    type="radio"
-                                    value="lunch"
-                                    checked={entryType === 'lunch'}
-                                    onChange={(e) => setEntryType(e.target.value)}
-                                />
-                                <span className="ml-1">Lunch</span>
-                            </label>
-                            <label>
-                                <input
-                                    type="radio"
-                                    value="dinner"
-                                    checked={entryType === 'dinner'}
-                                    onChange={(e) => setEntryType(e.target.value)}
-                                />
-                                <span className="ml-1">Dinner</span>
-                            </label>
-                            <label>
-                                <input
-                                    type="radio"
-                                    value="kit"
-                                    checked={entryType === 'kit'}
-                                    onChange={(e) => setEntryType(e.target.value)}
-                                />
-                                <span className="ml-1">Kit</span>
-                            </label>
+                    <div className="input-group w-full md:flex">
+                        <label className="block md:inline-block w-1/4 md:ml-6 mb-2 md:mb-0">Entry Type</label>
+                        <div className="entry-options flex flex-col md:flex-row w-full p-1 space-y-2 md:space-y-0 md:space-x-2">
+                            {['venue_entry', 'snacks', 'lunch', 'dinner', 'kit'].map((type) => (
+                                <label key={type} className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        value={type}
+                                        checked={entryType === type}
+                                        onChange={(e) => setEntryType(e.target.value)}
+                                    />
+                                    <span className="ml-1 capitalize">{type.replace('_', ' ')}</span>
+                                </label>
+                            ))}
                         </div>
                     </div>
-                    <button type="submit" className="bg-sky-800 md:mt-0 mt-4">Submit</button>
+
+                    <button type="submit" className="bg-sky-800 w-full p-2 text-white rounded-md hover:bg-sky-700">
+                        Submit
+                    </button>
                 </form>
 
                 {/* Error Handling */}
-                {success && <div id="showSuccess" className="error-message text-green-500 pt-8"><AlertSuccess message={success} /><br /><div className='text-sky-800 text-center'>{status}</div></div>}
-                {error && <div id="showError" className="error-message text-red-500 pt-8"><AlertError message={error} /><br /><div className='text-sky-800 text-center'>{status}</div></div>}
+                {success && <div className="error-message text-green-500 pt-8"><AlertSuccess message={success} /><br /><div className='text-sky-800 text-center'>{status}</div></div>}
+                {error && <div className="error-message text-red-500 pt-8"><AlertError message={error} /><br /><div className='text-sky-800 text-center'>{status}</div></div>}
             </div>
 
-            <div className="stats-section md:basis-[100%] basis-[55%] bg-sky-800 md:p-10 p-2">
-                <h1 className="text-3xl font-normal text-white pb-6">Congress statistics at a glance</h1>
-                <div className="stats-grid flex w-full">
-                    <StatCard label="# Attendees" value={stats.attendees} icon="👥" className="w-1/3" />
-                    <StatCard label="# Faculty" value={stats.faculty} icon="👥" className="w-1/3" />
-                    <StatCard label="# Delegates" value={stats.delegates} icon="👥" className="w-1/3" />
-                    <StatCard label="# Snacks" value={stats.snacks} icon="🍴" className="w-1/3" />
-                    <StatCard label="# Lunch" value={stats.lunch} icon="🍽️" className="w-1/3" />
-                    <StatCard label="# Dinner" value={stats.dinner} icon="🍕" className="w-1/3" />
-                    <StatCard label="# Kit" value={stats.kit} icon="📦" className="w-1/3" />
+
+            {/* Stats Section */}
+            <div className="stats-section flex flex-col justify-center lg:basis-[55%] bg-sky-800 p-4 lg:p-10 text-white">
+                <h1 className="text-3xl font-normal pb-6">Congress statistics at a glance</h1>
+                <div className="stats-grid grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <StatCard label="# Attendees" value={stats.attendees} icon="👥" />
+                    <StatCard label="# Faculty" value={stats.faculty} icon="👥" />
+                    <StatCard label="# Delegates" value={stats.delegates} icon="👥" />
+                    <StatCard label="# Snacks" value={stats.snacks} icon="🍴" />
+                    <StatCard label="# Lunch" value={stats.lunch} icon="🍽️" />
+                    <StatCard label="# Dinner" value={stats.dinner} icon="🍕" />
+                    <StatCard label="# Kit" value={stats.kit} icon="📦" />
                 </div>
             </div>
+
         </div>
     );
 };

@@ -17,7 +17,7 @@ const submitLogin = () => {
         e.preventDefault();
 
         try {
-            let response = await axios.post("http://localhost:8000/api/login", user);
+            let response = await axios.post("/api/login", user);
             const userToken = response.data.data.token;
             localStorage.setItem('token', userToken);
 

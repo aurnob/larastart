@@ -10,7 +10,7 @@ import Users from '@/Pages/Admin/User/Users';
 import User from '@/Pages/Admin/User/User';
 import Signup from '@/Pages/Auth/Signup';
 import Logout from '@/Pages/Auth/Logout';
-import Example from '@/components/Example';
+// import Example from '@/components/Example';
 
 const rootElement = document.getElementById('app');
 
@@ -19,7 +19,7 @@ if (rootElement) {
     ReactDOM.createRoot(rootElement).render(
         <Router>
             <Routes>
-                <Route path="/" element={<Example />} />
+                <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
