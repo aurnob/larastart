@@ -21,6 +21,7 @@ const Dashboard = () => {
         snacks: 0,
         lunch: 0,
         dinner: 0,
+        kit: 0,
     });
 
     useEffect(() => {
@@ -164,6 +165,15 @@ const Dashboard = () => {
                                 />
                                 <span className="ml-1">Dinner</span>
                             </label>
+                            <label>
+                                <input
+                                    type="radio"
+                                    value="kit"
+                                    checked={entryType === 'kit'}
+                                    onChange={(e) => setEntryType(e.target.value)}
+                                />
+                                <span className="ml-1">Kit</span>
+                            </label>
                         </div>
                     </div>
                     <button type="submit" className="bg-sky-800 md:mt-0 mt-4">Submit</button>
@@ -183,6 +193,7 @@ const Dashboard = () => {
                     <StatCard label="# Snacks" value={stats.snacks} icon="🍴" className="w-1/3" />
                     <StatCard label="# Lunch" value={stats.lunch} icon="🍽️" className="w-1/3" />
                     <StatCard label="# Dinner" value={stats.dinner} icon="🍕" className="w-1/3" />
+                    <StatCard label="# Kit" value={stats.kit} icon="📦" className="w-1/3" />
                 </div>
             </div>
         </div>

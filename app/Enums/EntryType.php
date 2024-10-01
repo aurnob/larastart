@@ -8,4 +8,5 @@ enum EntryType: string
     case Snacks = 'snacks';
     case Lunch = 'lunch';
     case Dinner = 'dinner';
+    case Kit = 'kit';
 }

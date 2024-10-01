@@ -87,6 +87,11 @@ class VisitorController extends Controller
             ->distinct('visitor_id')
             ->count();
 
+        // Total kit entries
+        $kit = Entry::where('entry_type', 'kit')
+            ->distinct('visitor_id')
+            ->count();
+
         return response()->json([
             'attendees' => $attendees,
             'faculty' => $faculty,
@@ -94,6 +99,7 @@ class VisitorController extends Controller
             'snacks' => $snacks,
             'lunch' => $lunch,
             'dinner' => $dinner,
+            'kit' => $kit,
         ]);
     }
 }
