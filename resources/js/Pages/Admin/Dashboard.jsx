@@ -157,7 +157,7 @@ const Dashboard = () => {
 
             {/* Stats Section */}
             <div className="stats-section flex flex-col justify-center lg:basis-[55%] bg-sky-800 p-4 lg:p-10 text-white">
-                <h1 className="text-xl md:text-3xl font-normal pb-6">Congress statistics at a glance</h1>
+                <h1 className="text-2xl md:text-3xl font-normal pb-6">Congress statistics at a glance</h1>
                 <div className="stats-grid grid grid-cols-2 md:grid-cols-3 gap-4">
                     <StatCard label="# Attendees" value={stats.attendees} icon="👥" />
                     <StatCard label="# Faculty" value={stats.faculty} icon="👥" />
