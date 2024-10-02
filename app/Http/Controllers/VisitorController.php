@@ -14,31 +14,40 @@ class VisitorController extends Controller
 {
     public function scanEntry(Request $request)
     {
+        // Validate the incoming request
         $request->validate([
             'registration_code' => 'required|string|max:255',
             'entry_type' => ['required', Rule::in(array_column(EntryType::cases(), 'value'))],
         ]);
 
+        // Find the visitor by registration code
         $visitor = Visitor::where('registration_code', $request->registration_code)->first();
 
         if (!$visitor) {
             return response()->json(['error' => 'Visitor not found'], 404);
         }
 
+        // Get the entry type from the request
         $entryType = EntryType::from($request->entry_type);
 
+        // Get today's date
+        $todayDate = Carbon::now()->toDateString();
+
+        // Check if an entry already exists for the visitor, entry type, and today's date
         $entryExists = Entry::where('visitor_id', $visitor->id)
             ->where('entry_type', $entryType)
+            ->where('entry_date', $todayDate)  // Ensure the entry is unique for the day
             ->first();
 
         if ($entryExists) {
-            $visitorEntry =  Visitor::with(['entries' => function ($query) use ($request) {
+            // Return error if an entry already exists for this visitor for the day
+            $visitorEntry = Visitor::with(['entries' => function ($query) use ($request) {
                 $query->where('entry_type', $request->entry_type);
             }])
                 ->where('registration_code', $request->registration_code)
                 ->get();
 
-            return response()->json(['error' => 'Entry already exists for this QR code and entry type.', 'data' => $visitorEntry], 400);
+            return response()->json(['error' => 'Entry already exists for this QR code and entry type for today.', 'data' => $visitorEntry], 400);
         }
 
         // Create a new entry record
@@ -46,8 +55,10 @@ class VisitorController extends Controller
             'visitor_id' => $visitor->id,
             'entry_type' => $entryType,
             'entry_time' => Carbon::now()->setTimezone(config('app.timezone')),
+            'entry_date' => $todayDate,  // Add the date component to enforce the one-entry-per-day rule
         ]);
 
+        // Return a success response
         return response()->json(['success' => 'Entry recorded successfully.', 'visitor' => $visitor, 'entries' => $create]);
     }
 

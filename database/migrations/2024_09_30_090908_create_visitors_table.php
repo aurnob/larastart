@@ -26,9 +26,11 @@ return new class extends Migration
             $table->foreignId('visitor_id')->constrained('visitors')->onDelete('cascade');
             $table->enum('entry_type', array_column(EntryType::cases(), 'value'));
             $table->timestamp('entry_time');
+            $table->date('entry_date'); // New column to store only the date portion of entry_time
             $table->timestamps();
 
-            $table->unique(['visitor_id', 'entry_type']); // Ensure unique entries
+            // Unique constraint to ensure visitor can only take entry once per day for a specific entry_type
+            $table->unique(['visitor_id', 'entry_type', 'entry_date']);
         });
     }
 
