@@ -24,7 +24,7 @@ class AuthController extends Controller
 
         NewUserCreated::dispatch($user);
 
-        return response(['user' => $user, 'message' => 'user created'], 200);
+        return ApiResponse::success(['user' => $user], 'user created');
     }
 
     public function validateEmail($token)
@@ -42,17 +42,13 @@ class AuthController extends Controller
         $user = User::where('email', $fields['email'])->first();
 
         if (is_null($user) || !Hash::check($fields['password'], $user->password)) {
-            return ApiResponse::error('Invalid email or password', 422, [
-                'isLoggedIn' => false
-            ]);
+            return ApiResponse::error('Invalid email or password', 422, ['isLoggedIn' => false]);
         }
 
         $emailValidationResult = $userValidation->validateUserEmail($user);
 
         if ($emailValidationResult) {
-            return ApiResponse::error($emailValidationResult['message'], 422, [
-                'isLoggedIn' => false
-            ]);
+            return ApiResponse::error($emailValidationResult['message'], 422, ['isLoggedIn' => false]);
         }
 
         $token = $user->createToken($this->secretKey)->plainTextToken;
@@ -68,6 +64,6 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response(['message' => 'logout user'], 200);
+        return ApiResponse::success([], 'Successfully logged out');
     }
 }
